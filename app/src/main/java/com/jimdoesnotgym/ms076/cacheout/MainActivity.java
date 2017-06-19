@@ -1,9 +1,13 @@
 package com.jimdoesnotgym.ms076.cacheout;
 
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
+import android.os.Build;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
@@ -13,13 +17,34 @@ import java.lang.reflect.Method;
 
 public class MainActivity extends AppCompatActivity {
 
-    AVLoadingIndicatorView avi;
-    Button mBtnClearCache;
+    private static final String TAG = "MainActivity";
+    private AVLoadingIndicatorView avi;
+    private Button mBtnClearCache;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+            Log.d(TAG, "version >= marshmallow");
+            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+            builder.setTitle("Error").
+                    setMessage("You're phone is currently using Android " +
+                            Build.VERSION_CODES.class.getFields()[Build.VERSION.SDK_INT].getName() +
+                            " (" + Build.VERSION.RELEASE + ")" +
+                            ", and is unable to use the features in this app. The app will now close.").
+            setCancelable(false);
+            builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    finish();
+                }
+            });
+
+            AlertDialog dialog = builder.create();
+            dialog.show();
+        }
 
         avi = (AVLoadingIndicatorView) findViewById(R.id.avi);
         mBtnClearCache = (Button) findViewById(R.id.btn_clear_cache);
